@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b18">
+  <meta name="description" content="AI Story Studio - अपनी कहानी को वीडियो में बदलें।">
+  <title>AI Story Studio — Create Your Story</title>
+  <link rel="stylesheet" href="frontend/style.css">
+</head>
+
+<body>
+  <header class="navbar">
+    <a class="brand" href="#">
+      <svg class="logo" viewBox="0 0 64 64" role="img" aria-label="AI Story Studio logo">
+        <defs>
+          <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <rect x="3" y="3" width="58" height="58" rx="18" fill="#17152e" stroke="url(#logoGradient)" stroke-width="3"/>
+        <path d="M17 43 L27 19 L37 43 M21 34 H33" fill="none" stroke="url(#logoGradient)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M40 25 L51 32 L40 39 Z" fill="#22d3ee"/>
+        <circle cx="48" cy="17" r="3" fill="#a855f7"/>
+      </svg>
+      <span>AI <strong>STORY</strong> STUDIO</span>
+    </a>
+
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+
+    <nav id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#create">Create Video</a>
+      <a href="#styles">Styles</a>
+      <a href="#about">About</a>
+    </nav>
+
+    <a href="#create" class="nav-button">Start Creating ↗</a>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-glow"></div>
+
+      <div class="hero-content">
+        <div class="tag">
+          <span class="live-dot"></span>
+          YOUR AI STORYTELLING STUDIO
+        </div>
+
+        <h1>
+          Your Imagination.<br>
+          <span>One Amazing Video.</span>
+        </h1>
+
+        <p>
+          बस अपनी कहानी या आइडिया लिखें। AI उसे कहानी, आवाज़,
+          सीन और शानदार वीडियो में बदलने में आपकी मदद करेगा।
+        </p>
+
+        <a href="#create" class="primary-button">✦ Create Your Story</a>
+
+        <div class="hero-features">
+          <span>✦ Hindi Voice</span>
+          <span>✦ Auto Scenes</span>
+          <span>✦ Video Export</span>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="visual-card">
+          <div class="visual-top">
+            <span class="visual-dot"></span>
+            <span>AI STORY ENGINE</span>
+            <span class="visual-status">READY</span>
+          </div>
+          <div class="visual-icon">▶</div>
+          <h3>Story to Video</h3>
+          <p>Imagine it. Create it.</p>
+          <div class="visual-wave">
+            <i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+        <div class="floating-chip chip-one">🎙 Hindi Voice</div>
+        <div class="floating-chip chip-two">🎬 Smart Scenes</div>
+      </div>
+    </section>
+
+    <section class="create-section" id="create">
+      <div class="section-heading">
+        <span class="eyebrow">LET'S CREATE SOMETHING</span>
+        <h2>अपनी कहानी शुरू करें</h2>
+        <p>एक आइडिया लिखें और अपनी वीडियो बनाने की प्रक्रिया शुरू करें।</p>
+      </div>
+
+      <div class="creator-card">
+        <label for="storyPrompt">आप किस विषय पर वीडियो बनाना चाहते हैं?</label>
+        <textarea id="storyPrompt" rows="5"
+          placeholder="उदाहरण: एक गरीब लड़का जो अपनी मेहनत से वैज्ञानिक बनता है..."></textarea>
+
+        <div class="creator-options">
+          <div class="option-group">
+            <label for="language">Voice Language</label>
+            <select id="language">
+              <option value="hi">हिंदी</option>
+              <option value="hinglish">Hinglish</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          <div class="option-group">
+            <label for="duration">Video Duration</label>
+            <select id="duration">
+              <option value="auto">Auto (Story Based)</option>
+              <option value="60">1 Minute</option>
+              <option value="180">3 Minutes</option>
+              <option value="300">5 Minutes</option>
+              <option value="600">10 Minutes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="creator-actions">
+          <span class="free-note">✦ Free-first creation</span>
+          <button id="generateBtn" class="primary-button">
+            ✨ Generate My Story
+          </button>
+        </div>
+
+        <p id="statusMessage" class="status-message" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="styles-section" id="styles">
+      <div class="section-heading">
+        <span class="eyebrow">CHOOSE YOUR VISUAL WORLD</span>
+        <h2>अपनी वीडियो का स्टाइल चुनें</h2>
+        <p>एक ही कहानी, चार अलग-अलग अंदाज़।</p>
+      </div>
+
+      <div class="style-grid">
+        <button class="style-card selected" data-style="realistic">
+          <div class="style-art realistic-art">🎥</div>
+          <h3>Realistic Cinema</h3>
+          <p>असली इंसानों जैसी सिनेमैटिक कहानी।</p>
+          <span class="style-check">✓</span>
+        </button>
+
+        <button class="style-card" data-style="stickman">
+          <div class="style-art stickman-art">🧍</div>
+          <h3>2D Stickman</h3>
+          <p>मज़ेदार स्टिकमैन और एक्सप्लेनर वीडियो।</p>
+          <span class="style-check">✓</span>
+        </button>
+
+        <button class="style-card" data-style="motion">
+          <div class="style-art motion-art">📊</div>
+          <h3>Motion Graphics</h3>
+          <p>इन्फोग्राफिक्स और एनिमेटेड टेक्स्ट।</p>
+          <span class="style-check">✓</span>
+        </button>
+
+        <button class="style-card" data-style="cartoon">
+          <div class="style-art cartoon-art">🪄</div>
+          <h3>3D Cartoon</h3>
+          <p>रंगीन 3D कार्टून स्टोरीटेलिंग।</p>
+          <span class="style-check">✓</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="how-section" id="about">
+      <div class="section-heading">
+        <span class="eyebrow">SIMPLE WORKFLOW</span>
+        <h2>तीन आसान स्टेप</h2>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <span>01</span>
+          <h3>Write Your Idea</h3>
+          <p>अपना विषय या कहानी लिखें।</p>
+        </div>
+        <div class="step-card">
+          <span>02</span>
+          <h3>AI Creates</h3>
+          <p>कहानी, आवाज़ और सीन तैयार होंगे।</p>
+        </div>
+        <div class="step-card">
+          <span>03</span>
+          <h3>Export Video</h3>
+          <p>अपनी तैयार वीडियो MP4 में डाउनलोड करें।</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="brand footer-brand" href="#">
+      <span class="footer-mark">✦</span>
+      AI <strong>STORY STUDIO</strong>
+    </a>
+    <p>Turn your imagination into stories.</p>
+    <p class="copyright">© 2026 AI Story Studio</p>
+  </footer>
+
+  <script src="frontend/app.js"></script>
+</body>
+  </html>
+  
