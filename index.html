@@ -2,213 +2,426 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#090b18">
-  <meta name="description" content="AI Story Studio - अपनी कहानी को वीडियो में बदलें।">
-  <title>AI Story Studio — Create Your Story</title>
-  <link rel="stylesheet" href="frontend/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090b18">
+<meta name="description" content="AI Story Studio - Turn your imagination into videos.">
+<title>AI Story Studio</title>
+
+<style>
+:root{
+  --bg:#090b18;
+  --panel:#12152a;
+  --panel2:#191d36;
+  --purple:#a855f7;
+  --blue:#22d3ee;
+  --text:#f7f7ff;
+  --muted:#a5abc4;
+  --border:rgba(255,255,255,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+  line-height:1.6;
+}
+button,input,textarea,select{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer}
+.navbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:15px;padding:13px 6%;
+  background:rgba(9,11,24,.91);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800}
+.brand strong{color:var(--blue)}
+.logo{width:43px;height:43px;flex-shrink:0}
+nav{display:flex;gap:25px;color:var(--muted);font-size:14px}
+nav a:hover{color:var(--blue)}
+.nav-button,.primary-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;padding:12px 21px;border:0;border-radius:12px;
+  color:white;font-weight:750;
+  background:linear-gradient(110deg,var(--purple),#6366f1,var(--blue));
+  box-shadow:0 7px 30px rgba(139,92,246,.19);
+  transition:.2s;
+}
+.nav-button:hover,.primary-button:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.menu-btn{display:none;background:none;border:0;color:white;font-size:25px}
+.hero{
+  min-height:590px;padding:95px 8%;
+  display:grid;grid-template-columns:1.1fr .9fr;
+  align-items:center;gap:45px;position:relative;overflow:hidden;
+}
+.hero:before{
+  content:"";position:absolute;width:420px;height:420px;
+  background:rgba(139,92,246,.14);filter:blur(100px);
+  top:-130px;left:-100px;pointer-events:none;
+}
+.tag,.eyebrow{
+  display:inline-block;color:var(--blue);font-size:12px;
+  font-weight:800;letter-spacing:2px;
+}
+.tag{
+  padding:8px 13px;border:1px solid var(--border);
+  border-radius:30px;background:rgba(255,255,255,.04);
+}
+.live-dot{display:inline-block;width:7px;height:7px;background:#4ade80;border-radius:50%;margin-right:8px}
+.hero h1{font-size:clamp(38px,5.5vw,66px);line-height:1.12;margin:24px 0}
+.hero h1 span{
+  background:linear-gradient(90deg,var(--purple),var(--blue));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-content>p{color:var(--muted);max-width:560px;font-size:16px;margin-bottom:28px}
+.hero-features{display:flex;flex-wrap:wrap;gap:18px;margin-top:25px;color:#c8c9dc;font-size:13px}
+.hero-visual{position:relative;display:grid;place-items:center;min-height:350px}
+.visual-card{
+  width:min(100%,370px);padding:24px;border:1px solid rgba(168,85,247,.35);
+  border-radius:25px;background:linear-gradient(145deg,#191b3a,#101426);
+  box-shadow:0 25px 90px rgba(0,0,0,.4),0 0 45px rgba(139,92,246,.12);
+  text-align:center;
+}
+.visual-top{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);letter-spacing:1px}
+.visual-dot{width:8px;height:8px;border-radius:50%;background:#4ade80}
+.visual-status{color:#4ade80}
+.visual-icon{
+  width:110px;height:110px;margin:36px auto 20px;border-radius:30px;
+  display:grid;place-items:center;font-size:45px;
+  background:linear-gradient(135deg,var(--purple),#5255dd,var(--blue));
+  box-shadow:0 10px 50px rgba(139,92,246,.3);
+}
+.visual-card h3{font-size:23px}
+.visual-card p{color:var(--muted);font-size:13px}
+.visual-wave{height:35px;display:flex;justify-content:center;align-items:center;gap:5px;margin-top:20px}
+.visual-wave i{width:4px;border-radius:10px;background:var(--blue);height:var(--h);animation:wave .8s infinite alternate}
+.visual-wave i:nth-child(3n){background:var(--purple)}
+.visual-wave i:nth-child(2n){animation-delay:.3s}
+@keyframes wave{to{transform:scaleY(.35)}}
+.floating-chip{
+  position:absolute;background:#202443;border:1px solid var(--border);
+  padding:11px 15px;border-radius:12px;font-size:12px;
+  box-shadow:0 10px 30px #0005;
+}
+.chip-one{top:35px;right:0}
+.chip-two{bottom:30px;left:0}
+section.content-section{padding:75px 7%}
+.section-heading{text-align:center;margin-bottom:35px}
+.section-heading h2{font-size:clamp(27px,4vw,38px);margin:10px 0}
+.section-heading p{color:var(--muted);font-size:14px}
+.creator-card{
+  max-width:850px;margin:auto;padding:30px;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:22px;box-shadow:0 20px 60px #0002;
+}
+.creator-card>label,.option-group label{display:block;font-size:14px;font-weight:700;margin-bottom:10px}
+textarea,select{
+  width:100%;color:white;background:#0d1020;
+  border:1px solid #30344f;border-radius:12px;padding:14px;
+  outline:none;
+}
+textarea{resize:vertical;min-height:130px}
+textarea:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px #a855f722}
+.creator-options{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px}
+.creator-actions{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:22px;flex-wrap:wrap}
+.free-note{font-size:13px;color:#4ade80}
+.status-message{margin-top:15px;color:var(--blue);font-size:13px;min-height:20px}
+.styles-grid,.steps-grid{
+  max-width:1100px;margin:auto;display:grid;
+  grid-template-columns:repeat(4,1fr);gap:17px;
+}
+.style-card{
+  text-align:left;position:relative;padding:15px;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:18px;color:white;transition:.2s;
+}
+.style-card:hover{transform:translateY(-4px);border-color:#a855f788}
+.style-card.selected{border:1px solid var(--blue);background:#171a35;box-shadow:0 0 25px #22d3ee12}
+.style-art{
+  height:120px;display:grid;place-items:center;
+  font-size:48px;border-radius:13px;margin-bottom:14px;
+  background:linear-gradient(135deg,#38235d,#142d4c);
+}
+.stickman-art{background:linear-gradient(135deg,#233c63,#18264b)}
+.motion-art{background:linear-gradient(135deg,#164d62,#30235f)}
+.cartoon-art{background:linear-gradient(135deg,#58325b,#17485b)}
+.style-card h3{font-size:16px;margin-bottom:5px}
+.style-card p{font-size:12px;color:var(--muted)}
+.style-check{display:none;position:absolute;right:13px;top:13px;background:var(--blue);color:#07111d;border-radius:50%;width:23px;height:23px;text-align:center;font-weight:bold}
+.style-card.selected .style-check{display:block}
+.steps-grid{grid-template-columns:repeat(3,1fr)}
+.step-card{padding:25px;background:var(--panel);border:1px solid var(--border);border-radius:17px}
+.step-card span{font-size:28px;font-weight:900;color:var(--purple)}
+.step-card h3{margin:10px 0}
+.step-card p{color:var(--muted);font-size:13px}
+footer{text-align:center;padding:35px 15px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+.footer-brand{justify-content:center;color:white;margin-bottom:8px}
+.footer-mark{color:var(--blue);font-size:23px}
+.copyright{margin-top:12px;font-size:11px}
+@media(max-width:800px){
+  .navbar{padding:12px 4%}
+  nav{display:none;position:absolute;top:68px;left:0;right:0;background:#11152a;padding:20px;flex-direction:column;gap:18px}
+  nav.open{display:flex}
+  .menu-btn{display:block;margin-left:auto}
+  .nav-button{display:none}
+  .hero{grid-template-columns:1fr;padding:65px 6%;text-align:center}
+  .hero-content>p{margin-left:auto;margin-right:auto}
+  .hero-features{justify-content:center}
+  .hero-visual{min-height:320px}
+  .styles-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:520px){
+  .creator-card{padding:19px}
+  .creator-options{grid-template-columns:1fr}
+  .creator-actions{align-items:stretch;flex-direction:column}
+  .creator-actions button{width:100%}
+  .steps-grid{grid-template-columns:1fr}
+  .style-art{height:95px}
+  .brand{font-size:14px}
+  .logo{width:37px;height:37px}
+}
+</style>
 </head>
 
 <body>
-  <header class="navbar">
-    <a class="brand" href="#">
-      <svg class="logo" viewBox="0 0 64 64" role="img" aria-label="AI Story Studio logo">
-        <defs>
-          <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#a855f7"/>
-            <stop offset="100%" stop-color="#22d3ee"/>
-          </linearGradient>
-        </defs>
-        <rect x="3" y="3" width="58" height="58" rx="18" fill="#17152e" stroke="url(#logoGradient)" stroke-width="3"/>
-        <path d="M17 43 L27 19 L37 43 M21 34 H33" fill="none" stroke="url(#logoGradient)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M40 25 L51 32 L40 39 Z" fill="#22d3ee"/>
-        <circle cx="48" cy="17" r="3" fill="#a855f7"/>
-      </svg>
-      <span>AI <strong>STORY</strong> STUDIO</span>
-    </a>
 
-    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+<header class="navbar">
+  <a class="brand" href="#home">
+    <svg class="logo" viewBox="0 0 64 64" role="img" aria-label="AI Story Studio">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop stop-color="#a855f7"/>
+          <stop offset="1" stop-color="#22d3ee"/>
+        </linearGradient>
+      </defs>
+      <rect x="3" y="3" width="58" height="58" rx="18" fill="#17152e" stroke="url(#lg)" stroke-width="3"/>
+      <path d="M17 43 L27 19 L37 43 M21 34 H33" fill="none" stroke="url(#lg)" stroke-width="4" stroke-linecap="round"/>
+      <path d="M40 25 L51 32 L40 39 Z" fill="#22d3ee"/>
+      <circle cx="48" cy="17" r="3" fill="#a855f7"/>
+    </svg>
+    <span>AI <strong>STORY</strong> STUDIO</span>
+  </a>
 
-    <nav id="navLinks">
-      <a href="#home">Home</a>
-      <a href="#create">Create Video</a>
-      <a href="#styles">Styles</a>
-      <a href="#about">About</a>
-    </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+  <nav id="navLinks">
+    <a href="#home">Home</a>
+    <a href="#create">Create Video</a>
+    <a href="#styles">Styles</a>
+    <a href="#about">About</a>
+  </nav>
+  <a href="#create" class="nav-button">Start Creating ↗</a>
+</header>
 
-    <a href="#create" class="nav-button">Start Creating ↗</a>
-  </header>
+<main>
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="tag"><span class="live-dot"></span> YOUR AI STORYTELLING STUDIO</div>
+    <h1>Your Imagination.<br><span>One Amazing Video.</span></h1>
+    <p>बस अपना आइडिया लिखें। AI आपकी कहानी, आवाज़ और विज़ुअल सीन तैयार करने में मदद करेगा। अपनी कल्पना को वीडियो में बदलें।</p>
+    <a href="#create" class="primary-button">✦ Create Your Story</a>
+    <div class="hero-features">
+      <span>✦ Hindi Voice</span>
+      <span>✦ Smart Scenes</span>
+      <span>✦ MP4 Export</span>
+    </div>
+  </div>
 
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-glow"></div>
-
-      <div class="hero-content">
-        <div class="tag">
-          <span class="live-dot"></span>
-          YOUR AI STORYTELLING STUDIO
-        </div>
-
-        <h1>
-          Your Imagination.<br>
-          <span>One Amazing Video.</span>
-        </h1>
-
-        <p>
-          बस अपनी कहानी या आइडिया लिखें। AI उसे कहानी, आवाज़,
-          सीन और शानदार वीडियो में बदलने में आपकी मदद करेगा।
-        </p>
-
-        <a href="#create" class="primary-button">✦ Create Your Story</a>
-
-        <div class="hero-features">
-          <span>✦ Hindi Voice</span>
-          <span>✦ Auto Scenes</span>
-          <span>✦ Video Export</span>
-        </div>
+  <div class="hero-visual">
+    <div class="visual-card">
+      <div class="visual-top"><span class="visual-dot"></span><span>AI STORY ENGINE</span><span class="visual-status">READY</span></div>
+      <div class="visual-icon">▶</div>
+      <h3>Story to Video</h3>
+      <p>Imagine it. Create it.</p>
+      <div class="visual-wave">
+        <i style="--h:12px"></i><i style="--h:25px"></i><i style="--h:17px"></i><i style="--h:32px"></i><i style="--h:15px"></i>
+        <i style="--h:27px"></i><i style="--h:12px"></i><i style="--h:31px"></i><i style="--h:19px"></i><i style="--h:26px"></i>
       </div>
+    </div>
+    <div class="floating-chip chip-one">🎙 Hindi Voice</div>
+    <div class="floating-chip chip-two">🎬 Smart Scenes</div>
+  </div>
+</section>
 
-      <div class="hero-visual">
-        <div class="visual-card">
-          <div class="visual-top">
-            <span class="visual-dot"></span>
-            <span>AI STORY ENGINE</span>
-            <span class="visual-status">READY</span>
-          </div>
-          <div class="visual-icon">▶</div>
-          <h3>Story to Video</h3>
-          <p>Imagine it. Create it.</p>
-          <div class="visual-wave">
-            <i></i><i></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i>
-          </div>
-        </div>
-        <div class="floating-chip chip-one">🎙 Hindi Voice</div>
-        <div class="floating-chip chip-two">🎬 Smart Scenes</div>
+<section class="content-section" id="create">
+  <div class="section-heading">
+    <span class="eyebrow">LET'S CREATE SOMETHING</span>
+    <h2>अपनी कहानी शुरू करें</h2>
+    <p>एक आइडिया लिखें और वीडियो बनाने की प्रक्रिया शुरू करें।</p>
+  </div>
+
+  <div class="creator-card">
+    <label for="storyPrompt">आप किस विषय पर वीडियो बनाना चाहते हैं?</label>
+    <textarea id="storyPrompt" placeholder="उदाहरण: एक गरीब लड़का जो अपनी मेहनत से वैज्ञानिक बनता है..."></textarea>
+
+    <div class="creator-options">
+      <div class="option-group">
+        <label for="language">Voice Language</label>
+        <select id="language">
+          <option value="hi">हिंदी</option>
+          <option value="hinglish">Hinglish</option>
+          <option value="en">English</option>
+        </select>
       </div>
-    </section>
-
-    <section class="create-section" id="create">
-      <div class="section-heading">
-        <span class="eyebrow">LET'S CREATE SOMETHING</span>
-        <h2>अपनी कहानी शुरू करें</h2>
-        <p>एक आइडिया लिखें और अपनी वीडियो बनाने की प्रक्रिया शुरू करें।</p>
+      <div class="option-group">
+        <label for="duration">Video Duration</label>
+        <select id="duration">
+          <option value="auto">Auto (Story Based)</option>
+          <option value="60">1 Minute</option>
+          <option value="180">3 Minutes</option>
+          <option value="300">5 Minutes</option>
+          <option value="600">10 Minutes</option>
+        </select>
       </div>
+    </div>
 
-      <div class="creator-card">
-        <label for="storyPrompt">आप किस विषय पर वीडियो बनाना चाहते हैं?</label>
-        <textarea id="storyPrompt" rows="5"
-          placeholder="उदाहरण: एक गरीब लड़का जो अपनी मेहनत से वैज्ञानिक बनता है..."></textarea>
+    <div class="creator-actions">
+      <span class="free-note">✦ Free-first creation</span>
+      <button id="generateBtn" class="primary-button">✨ Generate My Story</button>
+    </div>
+    <p id="statusMessage" class="status-message" aria-live="polite"></p>
+  </div>
+</section>
 
-        <div class="creator-options">
-          <div class="option-group">
-            <label for="language">Voice Language</label>
-            <select id="language">
-              <option value="hi">हिंदी</option>
-              <option value="hinglish">Hinglish</option>
-              <option value="en">English</option>
-            </select>
-          </div>
+<section class="content-section" id="styles">
+  <div class="section-heading">
+    <span class="eyebrow">CHOOSE YOUR VISUAL WORLD</span>
+    <h2>अपनी वीडियो का स्टाइल चुनें</h2>
+    <p>एक ही कहानी, चार अलग-अलग अंदाज़।</p>
+  </div>
 
-          <div class="option-group">
-            <label for="duration">Video Duration</label>
-            <select id="duration">
-              <option value="auto">Auto (Story Based)</option>
-              <option value="60">1 Minute</option>
-              <option value="180">3 Minutes</option>
-              <option value="300">5 Minutes</option>
-              <option value="600">10 Minutes</option>
-            </select>
-          </div>
-        </div>
+  <div class="styles-grid">
+    <button class="style-card selected" data-style="realistic">
+      <div class="style-art realistic-art">🎥</div>
+      <h3>Realistic Cinema</h3>
+      <p>असली इंसानों जैसी सिनेमैटिक कहानी।</p><span class="style-check">✓</span>
+    </button>
+    <button class="style-card" data-style="stickman">
+      <div class="style-art stickman-art">🧍</div>
+      <h3>2D Stickman</h3>
+      <p>मज़ेदार स्टिकमैन एक्सप्लेनर।</p><span class="style-check">✓</span>
+    </button>
+    <button class="style-card" data-style="motion">
+      <div class="style-art motion-art">📊</div>
+      <h3>Motion Graphics</h3>
+      <p>इन्फोग्राफिक्स और एनिमेटेड टेक्स्ट।</p><span class="style-check">✓</span>
+    </button>
+    <button class="style-card" data-style="cartoon">
+      <div class="style-art cartoon-art">🪄</div>
+      <h3>3D Cartoon</h3>
+      <p>रंगीन 3D कार्टून स्टोरीटेलिंग।</p><span class="style-check">✓</span>
+    </button>
+  </div>
+</section>
 
-        <div class="creator-actions">
-          <span class="free-note">✦ Free-first creation</span>
-          <button id="generateBtn" class="primary-button">
-            ✨ Generate My Story
-          </button>
-        </div>
+<section class="content-section" id="about">
+  <div class="section-heading">
+    <span class="eyebrow">SIMPLE WORKFLOW</span>
+    <h2>तीन आसान स्टेप</h2>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card"><span>01</span><h3>Write Your Idea</h3><p>अपना विषय या कहानी लिखें।</p></div>
+    <div class="step-card"><span>02</span><h3>AI Creates</h3><p>कहानी, आवाज़ और सीन तैयार होंगे।</p></div>
+    <div class="step-card"><span>03</span><h3>Export Video</h3><p>तैयार वीडियो MP4 में डाउनलोड करें।</p></div>
+  </div>
+</section>
+</main>
 
-        <p id="statusMessage" class="status-message" aria-live="polite"></p>
-      </div>
-    </section>
+<footer>
+  <div class="brand footer-brand"><span class="footer-mark">✦</span> AI <strong>STORY STUDIO</strong></div>
+  <p>Turn your imagination into stories.</p>
+  <p class="copyright">© 2026 AI Story Studio</p>
+</footer>
 
-    <section class="styles-section" id="styles">
-      <div class="section-heading">
-        <span class="eyebrow">CHOOSE YOUR VISUAL WORLD</span>
-        <h2>अपनी वीडियो का स्टाइल चुनें</h2>
-        <p>एक ही कहानी, चार अलग-अलग अंदाज़।</p>
-      </div>
+<script>
+"use strict";
 
-      <div class="style-grid">
-        <button class="style-card selected" data-style="realistic">
-          <div class="style-art realistic-art">🎥</div>
-          <h3>Realistic Cinema</h3>
-          <p>असली इंसानों जैसी सिनेमैटिक कहानी।</p>
-          <span class="style-check">✓</span>
-        </button>
+// Mobile navigation
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
 
-        <button class="style-card" data-style="stickman">
-          <div class="style-art stickman-art">🧍</div>
-          <h3>2D Stickman</h3>
-          <p>मज़ेदार स्टिकमैन और एक्सप्लेनर वीडियो।</p>
-          <span class="style-check">✓</span>
-        </button>
+menuBtn.addEventListener("click", () => {
+  navLinks.classList.toggle("open");
+});
 
-        <button class="style-card" data-style="motion">
-          <div class="style-art motion-art">📊</div>
-          <h3>Motion Graphics</h3>
-          <p>इन्फोग्राफिक्स और एनिमेटेड टेक्स्ट।</p>
-          <span class="style-check">✓</span>
-        </button>
+navLinks.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", () => navLinks.classList.remove("open"));
+});
 
-        <button class="style-card" data-style="cartoon">
-          <div class="style-art cartoon-art">🪄</div>
-          <h3>3D Cartoon</h3>
-          <p>रंगीन 3D कार्टून स्टोरीटेलिंग।</p>
-          <span class="style-check">✓</span>
-        </button>
-      </div>
-    </section>
+// Video style selection
+let selectedStyle = "realistic";
 
-    <section class="how-section" id="about">
-      <div class="section-heading">
-        <span class="eyebrow">SIMPLE WORKFLOW</span>
-        <h2>तीन आसान स्टेप</h2>
-      </div>
+document.querySelectorAll(".style-card").forEach(card => {
+  card.addEventListener("click", () => {
+    document.querySelectorAll(".style-card").forEach(item => {
+      item.classList.remove("selected");
+    });
+    card.classList.add("selected");
+    selectedStyle = card.dataset.style;
+  });
+});
 
-      <div class="steps-grid">
-        <div class="step-card">
-          <span>01</span>
-          <h3>Write Your Idea</h3>
-          <p>अपना विषय या कहानी लिखें।</p>
-        </div>
-        <div class="step-card">
-          <span>02</span>
-          <h3>AI Creates</h3>
-          <p>कहानी, आवाज़ और सीन तैयार होंगे।</p>
-        </div>
-        <div class="step-card">
-          <span>03</span>
-          <h3>Export Video</h3>
-          <p>अपनी तैयार वीडियो MP4 में डाउनलोड करें।</p>
-        </div>
-      </div>
-    </section>
-  </main>
+// Backend configuration
+// Backend deploy hone ke baad yahan apna API URL set karenge.
+const API_BASE_URL = "";
 
-  <footer>
-    <a class="brand footer-brand" href="#">
-      <span class="footer-mark">✦</span>
-      AI <strong>STORY STUDIO</strong>
-    </a>
-    <p>Turn your imagination into stories.</p>
-    <p class="copyright">© 2026 AI Story Studio</p>
-  </footer>
+// Story generation
+const generateBtn = document.getElementById("generateBtn");
+const statusMessage = document.getElementById("statusMessage");
 
-  <script src="frontend/app.js"></script>
+generateBtn.addEventListener("click", async () => {
+  const prompt = document.getElementById("storyPrompt").value.trim();
+  const language = document.getElementById("language").value;
+  const duration = document.getElementById("duration").value;
+
+  if (!prompt) {
+    statusMessage.textContent = "पहले अपनी कहानी का आइडिया लिखें।";
+    document.getElementById("storyPrompt").focus();
+    return;
+  }
+
+  if (!API_BASE_URL) {
+    statusMessage.textContent =
+      "Frontend तैयार है। AI Story Engine जोड़ने के बाद Generation शुरू होगी।";
+    return;
+  }
+
+  generateBtn.disabled = true;
+  generateBtn.textContent = "Generating...";
+
+  try {
+    const response = await fetch(API_BASE_URL + "/api/story/generate", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        prompt,
+        language,
+        duration,
+        style: selectedStyle
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Server request failed: " + response.status);
+    }
+
+    const data = await response.json();
+    statusMessage.textContent =
+      data.message || "Story request completed.";
+  } catch (error) {
+    statusMessage.textContent =
+      "Server से कनेक्शन नहीं हो पाया। कृपया बाद में कोशिश करें।";
+  } finally {
+    generateBtn.disabled = false;
+    generateBtn.textContent = "✨ Generate My Story";
+  }
+});
+</script>
+
 </body>
-  </html>
-  
+</html>
+      
