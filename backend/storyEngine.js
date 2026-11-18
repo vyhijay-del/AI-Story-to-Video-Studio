@@ -233,6 +233,7 @@ Make the scenes follow a continuous story.
       headers: OLLAMA_HEADERS,
       body: JSON.stringify({
         model: MODEL,
+        think: false,
         messages: [
           {
             role: "system",
@@ -247,7 +248,7 @@ Make the scenes follow a continuous story.
         stream: false,
         options: {
           temperature: 0.8,
-          num_predict: 7000
+          num_predict: 2500
         }
       }),
       signal: AbortSignal.timeout(180000)
