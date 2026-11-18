@@ -1,8 +1,14 @@
 
 const OLLAMA_URL = (
   process.env.OLLAMA_URL || "http://127.0.0.1:11434"
-).replace(/\/$/, "");
+).replace(/\/+$/, "");
 
+const OLLAMA_HEADERS = {
+  "Content-Type": "application/json",
+  ...(process.env.OLLAMA_API_KEY
+    ? { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` }
+    : {})
+};
 const MODEL = process.env.OLLAMA_MODEL || "qwen3:4b";
 
 const STYLE_GUIDES = {
@@ -109,8 +115,9 @@ function normalizeStory(data, style, language) {
 export async function checkOllama() {
   try {
     const response = await fetch(`${OLLAMA_URL}/api/tags`, {
-      signal: AbortSignal.timeout(10000)
-    });
+  headers: OLLAMA_HEADERS,
+  signal: AbortSignal.timeout(10000)
+});
 
     if (!response.ok) {
       return {
@@ -223,9 +230,7 @@ Make the scenes follow a continuous story.
   try {
     response = await fetch(`${OLLAMA_URL}/api/chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: OLLAMA_HEADERS,
       body: JSON.stringify({
         model: MODEL,
         messages: [
