@@ -4,33 +4,31 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
+import {
+  generateStory,
+  checkOllama
+} from "./storyEngine.js";
+
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Basic middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || "*"
 }));
 
 app.use(express.json({ limit: "1mb" }));
 
-// Prevent excessive requests
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 30,
   standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: {
-    success: false,
-    error: "Too many requests. Please try again later."
-  }
+  legacyHeaders: false
 });
 
 app.use("/api", apiLimiter);
 
-// Home route
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -39,7 +37,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check
 app.get("/health", (req, res) => {
   res.json({
     success: true,
@@ -49,19 +46,26 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Story engine status
-app.get("/api/story/status", (req, res) => {
+// Check AI engine connection
+app.get("/api/story/status", async (req, res) => {
+  const status = await checkOllama();
+
   res.json({
     success: true,
-    storyEngine: "not_connected",
-    message: "AI Story Engine will be connected in the next step."
+    storyEngine: status.connected ? "online" : "offline",
+    ...status
   });
 });
 
-// Story generation API
+// Generate complete AI story
 app.post("/api/story/generate", async (req, res) => {
   try {
-    const { prompt, language, duration, style } = req.body || {};
+    const {
+      prompt,
+      language = "hi",
+      duration = "auto",
+      style = "realistic"
+    } = req.body || {};
 
     if (typeof prompt !== "string" || !prompt.trim()) {
       return res.status(400).json({
@@ -73,7 +77,7 @@ app.post("/api/story/generate", async (req, res) => {
     if (prompt.length > 5000) {
       return res.status(400).json({
         success: false,
-        error: "Story idea is too long. Maximum 5000 characters."
+        error: "Maximum prompt length is 5000 characters."
       });
     }
 
@@ -84,22 +88,23 @@ app.post("/api/story/generate", async (req, res) => {
       "motion",
       "cartoon"
     ];
+    const allowedDurations = [
+      "auto", "60", "180", "300", "600"
+    ];
 
     if (!allowedLanguages.includes(language)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid language selected."
+        error: "Invalid language."
       });
     }
 
     if (!allowedStyles.includes(style)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid video style selected."
+        error: "Invalid visual style."
       });
     }
-
-    const allowedDurations = ["auto", "60", "180", "300", "600"];
 
     if (!allowedDurations.includes(String(duration))) {
       return res.status(400).json({
@@ -108,24 +113,29 @@ app.post("/api/story/generate", async (req, res) => {
       });
     }
 
-    return res.status(501).json({
-      success: false,
-      status: "engine_not_connected",
-      message: "AI Story Engine is not connected yet.",
-      request: {
-        prompt: prompt.trim(),
-        language,
-        duration,
-        style
-      }
+    const story = await generateStory({
+      prompt,
+      language,
+      duration: String(duration),
+      style
+    });
+
+    return res.json({
+      success: true,
+      status: "story_generated",
+      message: "Your AI story is ready!",
+      data: story
     });
 
   } catch (error) {
-    console.error("Story API Error:", error);
+    console.error("Story generation error:", error.message);
 
-    return res.status(500).json({
+    const isConnectionError =
+      error.message.includes("Cannot connect to Ollama");
+
+    return res.status(isConnectionError ? 503 : 500).json({
       success: false,
-      error: "Internal server error."
+      error: error.message || "Story generation failed."
     });
   }
 });
@@ -140,11 +150,11 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err.message);
+  console.error("Server error:", err.message);
 
   res.status(500).json({
     success: false,
-    error: "Something went wrong."
+    error: "Internal server error."
   });
 });
 
