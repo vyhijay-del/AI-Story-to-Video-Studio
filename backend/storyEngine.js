@@ -9,7 +9,7 @@ const OLLAMA_HEADERS = {
     ? { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` }
     : {})
 };
-const MODEL = process.env.OLLAMA_MODEL || "qwen3:4b";
+const MODEL = process.env.OLLAMA_MODEL || "qwen3:4b-instruct";
 
 const STYLE_GUIDES = {
   realistic:
