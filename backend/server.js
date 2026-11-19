@@ -62,11 +62,12 @@ app.get("/api/story/status", async (req, res) => {
 app.post("/api/story/generate", async (req, res) => {
   try {
     const {
-      prompt,
-      language = "hi",
-      duration = "auto",
-      style = "realistic"
-    } = req.body || {};
+  prompt,
+  language = "hi",
+  duration = "auto",
+  style = "realistic",
+  mode = "story"
+} = req.body || {};
 
     if (typeof prompt !== "string" || !prompt.trim()) {
       return res.status(400).json({
@@ -92,6 +93,7 @@ app.post("/api/story/generate", async (req, res) => {
     const allowedDurations = [
       "auto", "60", "180", "300", "600"
     ];
+    const allowedModes = ["story", "prompt"];
 
     if (!allowedLanguages.includes(language)) {
       return res.status(400).json({
@@ -99,7 +101,12 @@ app.post("/api/story/generate", async (req, res) => {
         error: "Invalid language."
       });
     }
-
+    if (!allowedModes.includes(mode)) {
+  return res.status(400).json({
+    success: false,
+    error: "Invalid generation mode."
+  });
+    }
     if (!allowedStyles.includes(style)) {
       return res.status(400).json({
         success: false,
@@ -115,11 +122,12 @@ app.post("/api/story/generate", async (req, res) => {
     }
 
     const story = await generateStory({
-      prompt,
-      language,
-      duration: String(duration),
-      style
-    });
+  prompt,
+  language,
+  duration: String(duration),
+  style,
+  mode
+});
 
     return res.json({
       success: true,
