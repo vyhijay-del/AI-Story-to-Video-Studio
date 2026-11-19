@@ -255,6 +255,16 @@ footer{text-align:center;padding:35px 15px;border-top:1px solid var(--border);co
   </div>
 
   <div class="creator-card">
+    <div class="option-group" style="margin-bottom:20px">
+  <label for="generationMode">Creation Mode</label>
+  <select id="generationMode">
+    <option value="story">📖 Story Mode — AI खुद कहानी बनाएगा</option>
+    <option value="prompt">🎬 Prompt-to-Video — मेरे निर्देशों के अनुसार</option>
+  </select>
+  <p style="color:var(--muted);font-size:12px;margin-top:7px">
+    Prompt Mode में पात्र, घटनाएँ और कहानी का विवरण खुद लिखें।
+  </p>
+    </div>
     <label for="storyPrompt">आप किस विषय पर वीडियो बनाना चाहते हैं?</label>
     <textarea id="storyPrompt" placeholder="उदाहरण: एक गरीब लड़का जो अपनी मेहनत से वैज्ञानिक बनता है..."></textarea>
 
@@ -377,7 +387,8 @@ generateBtn.addEventListener("click", async () => {
   const prompt = document.getElementById("storyPrompt").value.trim();
   const language = document.getElementById("language").value;
   const duration = document.getElementById("duration").value;
-
+  const mode = document.getElementById("generationMode").value;
+  
   if (!prompt) {
     statusMessage.textContent = "पहले अपनी कहानी का आइडिया लिखें।";
     document.getElementById("storyPrompt").focus();
@@ -394,16 +405,17 @@ generateBtn.addEventListener("click", async () => {
   generateBtn.textContent = "Generating...";
 
   try {
-    const response = await fetch(API_BASE_URL + "/api/story/generate", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        prompt,
-        language,
-        duration,
-        style: selectedStyle
-      })
-    });
+  const response = await fetch(API_BASE_URL + "/api/story/generate", {
+  method: "POST",
+  headers: {"Content-Type": "application/json"},
+  body: JSON.stringify({
+    prompt,
+    language,
+    duration,
+    style: selectedStyle,
+    mode
+  })
+});
 
     if (!response.ok) {
       throw new Error("Server request failed: " + response.status);
