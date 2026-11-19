@@ -9,6 +9,7 @@ const OLLAMA_HEADERS = {
     ? { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` }
     : {})
 };
+
 const MODEL = process.env.OLLAMA_MODEL || "qwen3:4b-instruct";
 
 const STYLE_GUIDES = {
@@ -64,8 +65,18 @@ function extractJSON(content) {
   try {
     return JSON.parse(jsonText);
   } catch (error) {
+    const match = error.message.match(/position\s+(\d+)/i);
+    const position = match ? Number(match[1]) : -1;
+
+    const snippet = position >= 0
+      ? jsonText.slice(
+          Math.max(0, position - 80),
+          Math.min(jsonText.length, position + 80)
+        )
+      : jsonText.slice(0, 160);
+
     throw new Error(
-      "AI generated invalid JSON. Please try again with a simpler prompt."
+      `AI generated invalid JSON: ${error.message}. Near: ${snippet}`
     );
   }
 }
@@ -123,9 +134,9 @@ function normalizeStory(data, style, language) {
 export async function checkOllama() {
   try {
     const response = await fetch(`${OLLAMA_URL}/api/tags`, {
-  headers: OLLAMA_HEADERS,
-  signal: AbortSignal.timeout(10000)
-});
+      headers: OLLAMA_HEADERS,
+      signal: AbortSignal.timeout(10000)
+    });
 
     if (!response.ok) {
       return {
@@ -135,7 +146,6 @@ export async function checkOllama() {
     }
 
     const data = await response.json();
-
     const models = (data.models || []).map(item => item.name);
 
     return {
@@ -153,7 +163,7 @@ export async function checkOllama() {
     };
   }
 }
-    
+
 export async function generateStory({
   prompt,
   language = "hi",
@@ -228,6 +238,8 @@ GENERAL REQUIREMENTS:
 - Make all scenes visually suitable for video.
 - Keep character appearance consistent across scenes.
 - Do not include markdown or explanations outside JSON.
+- Keep narration concise and avoid unnecessarily long descriptions.
+- Never stop before closing the JSON object.
 
 SCENE COUNT:
 Create exactly ${sceneCount} scenes.
@@ -275,24 +287,25 @@ Make the scenes follow a continuous story.
       method: "POST",
       headers: OLLAMA_HEADERS,
       body: JSON.stringify({
-  model: MODEL,
-  think: false,
-  prompt: `${systemPrompt}\n\n${userPrompt}`,
-  format: "json",
-  stream: false,
-  options: {
-    temperature: mode === "prompt" ? 0.3 : 0.7,
-    num_ctx: 4096,
-    num_predict: 2500
-  }
-}),
+        model: MODEL,
+        think: false,
+        prompt: `${systemPrompt}\n\n${userPrompt}`,
+        format: "json",
+        stream: false,
+        options: {
+          temperature: mode === "prompt" ? 0.3 : 0.7,
+          num_ctx: 4096,
+          num_predict: 4000
+        }
+      }),
       signal: AbortSignal.timeout(180000)
     });
-} catch (error) {
-  throw new Error(
-    `AI generated invalid JSON: ${error.message}`
-  );
+  } catch (error) {
+    throw new Error(
+      `Cannot connect to Ollama: ${error.message}`
+    );
   }
+
   if (!response.ok) {
     const details = await response.text();
 
@@ -307,6 +320,17 @@ Make the scenes follow a continuous story.
     throw new Error(result.error);
   }
 
+  if (!result.response || typeof result.response !== "string") {
+    throw new Error("Ollama returned an empty story response.");
+  }
+
+  if (result.done_reason === "length") {
+    throw new Error(
+      "AI response was cut off because the output token limit was reached."
+    );
+  }
+
   const generatedData = extractJSON(result.response);
+
   return normalizeStory(generatedData, style, language);
 }
