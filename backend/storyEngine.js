@@ -288,16 +288,11 @@ Make the scenes follow a continuous story.
 }),
       signal: AbortSignal.timeout(180000)
     });
-  } catch (error) {
-    if (error.name === "TimeoutError") {
-      throw new Error("AI generation timed out. Please try again.");
-    }
-
-    throw new Error(
-      "Cannot connect to Ollama. Check the AI server connection."
-    );
+} catch (error) {
+  throw new Error(
+    `AI generated invalid JSON: ${error.message}`
+  );
   }
-
   if (!response.ok) {
     const details = await response.text();
 
