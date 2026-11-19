@@ -41,7 +41,7 @@ function getSceneCount(duration) {
 }
 
 function extractJSON(content) {
-  if (typeof content !== "string") {
+  if (typeof content !== "string" || !content.trim()) {
     throw new Error("AI returned an empty response.");
   }
 
@@ -55,11 +55,19 @@ function extractJSON(content) {
   const start = cleaned.indexOf("{");
   const end = cleaned.lastIndexOf("}");
 
-  if (start === -1 || end === -1) {
+  if (start === -1 || end === -1 || end <= start) {
     throw new Error("AI response is not valid JSON.");
   }
 
-  return JSON.parse(cleaned.slice(start, end + 1));
+  const jsonText = cleaned.slice(start, end + 1);
+
+  try {
+    return JSON.parse(jsonText);
+  } catch (error) {
+    throw new Error(
+      "AI generated invalid JSON. Please try again with a simpler prompt."
+    );
+  }
 }
 
 function normalizeStory(data, style, language) {
@@ -210,6 +218,11 @@ ${STYLE_GUIDES[style]}
 ${modeInstructions}
 
 GENERAL REQUIREMENTS:
+- Return strictly valid JSON.
+- Escape all double quotes inside string values.
+- Do not add trailing commas.
+- Do not include comments inside JSON.
+- Ensure every opening bracket has a matching closing bracket.
 - Write natural narration suitable for text-to-speech.
 - Keep the story coherent from beginning to end.
 - Make all scenes visually suitable for video.
