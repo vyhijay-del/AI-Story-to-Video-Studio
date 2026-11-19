@@ -258,29 +258,21 @@ Make the scenes follow a continuous story.
   let response;
 
   try {
-    response = await fetch(`${OLLAMA_URL}/api/chat`, {
+    response = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: "POST",
       headers: OLLAMA_HEADERS,
       body: JSON.stringify({
-        model: MODEL,
-        think: false,
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          {
-            role: "user",
-            content: userPrompt
-          }
-        ],
-        format: "json",
-        stream: false,
-        options: {
-          temperature: mode === "prompt" ? 0.3 : 0.7,
-          num_predict: 2500
-        }
-      }),
+  model: MODEL,
+  think: false,
+  prompt: `${systemPrompt}\n\n${userPrompt}`,
+  format: "json",
+  stream: false,
+  options: {
+    temperature: mode === "prompt" ? 0.3 : 0.7,
+    num_ctx: 4096,
+    num_predict: 2500
+  }
+}),
       signal: AbortSignal.timeout(180000)
     });
   } catch (error) {
@@ -307,7 +299,6 @@ Make the scenes follow a continuous story.
     throw new Error(result.error);
   }
 
-  const generatedData = extractJSON(result.message?.content);
-
+  const generatedData = extractJSON(result.response);
   return normalizeStory(generatedData, style, language);
 }
