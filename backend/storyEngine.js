@@ -145,12 +145,13 @@ export async function checkOllama() {
     };
   }
 }
-
+    
 export async function generateStory({
   prompt,
   language = "hi",
   duration = "auto",
-  style = "realistic"
+  style = "realistic",
+  mode = "story"
 }) {
   if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
     throw new Error("Please provide a story idea.");
@@ -164,12 +165,41 @@ export async function generateStory({
     throw new Error("Unsupported visual style.");
   }
 
+  if (!["story", "prompt"].includes(mode)) {
+    throw new Error("Unsupported generation mode.");
+  }
+
   const sceneCount = getSceneCount(duration);
+
+  const modeInstructions = mode === "prompt"
+    ? `
+PROMPT MODE - STRICT INSTRUCTIONS:
+- Follow the user's prompt as faithfully as possible.
+- Treat the user's specified characters, locations, events,
+  relationships, tone and ending as important requirements.
+- Do not replace the user's main idea with a different story.
+- Do not introduce unnecessary characters or unrelated events.
+- Do not contradict any details supplied by the user.
+- You may add only small connecting details needed to create
+  coherent scenes.
+- If the user specifies an ending, preserve that ending.
+- Divide the requested content into exactly ${sceneCount} scenes.
+- Every scene must contribute to the user's requested story.
+`
+    : `
+STORY MODE - CREATIVE INSTRUCTIONS:
+- Create an original story inspired by the user's idea.
+- Create a strong opening hook.
+- Give the main character a clear goal.
+- Include believable conflict and emotional moments.
+- Build toward a satisfying climax and ending.
+- Keep character names and appearance consistent.
+- Make every scene visually interesting.
+- Avoid repeating the same scene.
+`;
 
   const systemPrompt = `
 You are a professional Indian screenwriter and visual storytelling director.
-
-Create an original, engaging and emotionally satisfying story from the user's idea.
 
 LANGUAGE:
 ${LANGUAGE_GUIDES[language]}
@@ -177,15 +207,13 @@ ${LANGUAGE_GUIDES[language]}
 VISUAL STYLE:
 ${STYLE_GUIDES[style]}
 
-STORY REQUIREMENTS:
-- Create a strong opening hook.
-- Give the main character a clear goal.
-- Include believable conflict and emotional moments.
-- Build toward a satisfying climax and ending.
-- Keep character names and appearance consistent across scenes.
-- Make every scene visually interesting and suitable for video.
-- Avoid repeating the same scene.
+${modeInstructions}
+
+GENERAL REQUIREMENTS:
 - Write natural narration suitable for text-to-speech.
+- Keep the story coherent from beginning to end.
+- Make all scenes visually suitable for video.
+- Keep character appearance consistent across scenes.
 - Do not include markdown or explanations outside JSON.
 
 SCENE COUNT:
@@ -214,14 +242,16 @@ Return JSON only. No markdown code fences.
 `;
 
   const userPrompt = `
-Create a complete video story using this idea:
+Generation mode: ${mode}
 
+User's idea or instructions:
 ${prompt.trim()}
 
 Target duration: ${duration}
 Visual style: ${style}
 Language: ${language}
 
+Create a complete video story with exactly ${sceneCount} scenes.
 Make the scenes follow a continuous story.
 `;
 
@@ -247,7 +277,7 @@ Make the scenes follow a continuous story.
         format: "json",
         stream: false,
         options: {
-          temperature: 0.8,
+          temperature: mode === "prompt" ? 0.3 : 0.7,
           num_predict: 2500
         }
       }),
