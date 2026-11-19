@@ -424,9 +424,9 @@ generateBtn.addEventListener("click", async () => {
     const data = await response.json();
     statusMessage.textContent =
       data.message || "Story request completed.";
-  } catch (error) {
-    statusMessage.textContent =
-      "Server से कनेक्शन नहीं हो पाया। कृपया बाद में कोशिश करें।";
+} catch (error) {
+  statusMessage.textContent =
+    "Error: " + error.message;
   } finally {
     generateBtn.disabled = false;
     generateBtn.textContent = "✨ Generate My Story";
